@@ -1,9 +1,25 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ja" data-ui-language="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>NAIA Remote</title>
+<script>
+(function () {
+  try {
+    var queryLanguage = new URLSearchParams(location.search).get('lang');
+    var savedLanguage = localStorage.getItem('naia_ui_language');
+    var language = queryLanguage === 'ko' || queryLanguage === 'ja'
+      ? queryLanguage
+      : (savedLanguage === 'ko' || savedLanguage === 'ja' ? savedLanguage : 'ja');
+    document.documentElement.lang = language;
+    document.documentElement.dataset.uiLanguage = language;
+  } catch (error) {
+    document.documentElement.lang = 'ja';
+    document.documentElement.dataset.uiLanguage = 'ja';
+  }
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=20260831-onechip">
@@ -40,6 +56,13 @@
       <span class="shell-brand-subtitle">Automation Tool</span>
     </div>
   </div>
+  <label class="ui-language-picker" data-naia-i18n-skip>
+    <span class="ui-language-label">UI</span>
+    <select id="uiLanguageSelect" data-native-select aria-label="UI language">
+      <option value="ja">日本語</option>
+      <option value="ko">한국어</option>
+    </select>
+  </label>
   <div class="prompt-quick-control toolbar-prompt-control">
     <button class="module-prompt-btn prompt-count-btn" onclick="openModule('search')" data-naia-guide="프롬프트 검색 패널을 엽니다. 태그·키워드로 아카이브 전체에서 결과셋을 새로 검색해 생성 풀을 만드는 '무거운' 검색입니다(명시적 실행). 옆 숫자는 현재 풀에 남은 프롬프트 수입니다.">Prompt: <span id="searchCount">0</span></button>
     <button class="quick-filter-btn tag-filter-toggle" id="tagFilterToggle" onclick="toggleTagFilter()" data-naia-guide="빠른 태그 필터를 엽니다. 이미 만들어진 결과셋을 재검색 없이 태그로 즉시 좁히는 '가벼운' 필터입니다(인메모리). 포함/제외 태그·등급으로 활성 풀만 거릅니다 — 큰 아카이브 검색을 다시 돌리지 않으려는 용도입니다.">Quick</button>
@@ -1377,6 +1400,8 @@ function openInSystemBrowser() {
   popup?.focus?.();
 }
 </script>
+<script src="i18n/ja.js?v=20260907-ja1"></script>
 <script src="app.js?v=20260831-onechip"></script>
+<script src="i18n/uiLanguage.js?v=20260907-ja1"></script>
 </body>
 </html>

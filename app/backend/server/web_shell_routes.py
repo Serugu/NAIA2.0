@@ -51,6 +51,7 @@ def register_web_shell_routes(app: FastAPI, root_web_dir: Path) -> None:
     mimetypes.add_type("text/javascript", ".mjs")
 
     js_dir = root_web_dir / "js"
+    i18n_dir = root_web_dir / "i18n"
     guides_dir = root_web_dir / "guides"
     if guides_dir.exists():
         app.mount("/guides", StaticFiles(directory=str(guides_dir), html=True), name="remote_guides")
@@ -77,3 +78,7 @@ def register_web_shell_routes(app: FastAPI, root_web_dir: Path) -> None:
     @app.get("/js/{asset_path:path}")
     async def serve_js_asset(asset_path: str):
         return _web_asset(js_dir, asset_path, default_media_type="text/javascript")
+
+    @app.get("/i18n/{asset_path:path}")
+    async def serve_i18n_asset(asset_path: str):
+        return _web_asset(i18n_dir, asset_path, default_media_type="text/javascript")

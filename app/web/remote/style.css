@@ -207,6 +207,70 @@ header {
   letter-spacing: 0.4px;
   white-space: nowrap;
 }
+.ui-language-picker {
+  display: inline-flex;
+  align-items: center;
+  height: 25px;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border: 1px solid rgba(232,232,240,0.22);
+  border-radius: 6px;
+  background: var(--bg-deep);
+  color: var(--text-dim);
+}
+.ui-language-label {
+  padding: 0 6px 0 7px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.ui-language-picker select {
+  width: 74px;
+  height: 100%;
+  padding: 0 18px 0 7px;
+  border: 0;
+  border-left: 1px solid rgba(232,232,240,0.12);
+  border-radius: 0;
+  outline: none;
+  appearance: none;
+  background-color: transparent;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%2377778c'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 10px;
+  cursor: pointer;
+}
+.ui-language-picker:focus-within {
+  border-color: rgba(157,139,255,0.7);
+}
+.ui-language-picker option {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+html[lang="ja"] body,
+html[lang="ja"] button,
+html[lang="ja"] input,
+html[lang="ja"] select,
+html[lang="ja"] textarea {
+  font-family: "Yu Gothic UI", "Yu Gothic", Meiryo, "Noto Sans JP", var(--font-display), sans-serif;
+}
+html[lang="ja"] [data-naia-guide],
+html[lang="ja"] .setup-sub,
+html[lang="ja"] .settings-toggle-desc {
+  line-height: 1.65;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+html[lang="ja"] .naia-title-tooltip.guide {
+  max-width: min(560px, calc(100vw - 24px));
+  line-height: 1.65;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
 .mode-api-combo {
   display: inline-flex;
   align-items: stretch;
@@ -19345,6 +19409,14 @@ select.setup-input { cursor: pointer; }
     flex-basis: 136px;
     min-width: 118px;
     max-width: 178px;
+  }
+  .ui-language-label {
+    display: none;
+  }
+  .ui-language-picker select {
+    width: 64px;
+    border-left: 0;
+    padding-left: 6px;
   }
 }
 
