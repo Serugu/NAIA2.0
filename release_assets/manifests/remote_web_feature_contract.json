@@ -51,6 +51,11 @@
       "path": "/guides",
       "source": "app/web/remote/guides",
       "smoke": "static"
+    },
+    {
+      "path": "/i18n",
+      "source": "app/web/remote/i18n",
+      "smoke": "static"
     }
   ],
   "feature_groups": [
@@ -68,6 +73,8 @@
         "app/web/remote/index.html",
         "app/web/remote/style.css",
         "app/web/remote/app.js",
+        "app/web/remote/i18n/ja.js",
+        "app/web/remote/i18n/uiLanguage.js",
         "app/web/remote/js/features/studioTab.mjs"
       ],
       "legacy_dependency": "none",
@@ -76,7 +83,8 @@
         {"method": "GET", "path": "/bootstrap.html", "smoke": "static"},
         {"method": "GET", "path": "/style.css", "smoke": "static"},
         {"method": "GET", "path": "/app.js", "smoke": "static"},
-        {"method": "GET", "path": "/js/{asset_path:path}", "smoke": "static"}
+        {"method": "GET", "path": "/js/{asset_path:path}", "smoke": "static"},
+        {"method": "GET", "path": "/i18n/{asset_path:path}", "smoke": "static"}
       ]
     },
     {
