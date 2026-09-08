@@ -1,0 +1,13 @@
+{
+  "provider": "Papago Web",
+  "sourceLanguage": "ko",
+  "targetLanguage": "ja",
+  "scope": "Previously Google-generated TAG_DESC descriptions; four faulty bulk replacements also retranslated",
+  "retranslated": 10705,
+  "previouslyCorrectedDescriptionsPreserved": 11,
+  "otherUiMessagesPreserved": 3290,
+  "totalUiMessages": 14006,
+  "postEditing": "Targeted source-checked corrections of broken tag names and wording",
+  "fullSemanticReview": false,
+  "candidateSha256": "a378c2a2bb06a420ee83c080f2251b8ccfd683d1a47fc459d35fc3747bdfac06"
+}

@@ -4,7 +4,7 @@
   const STORAGE_KEY = 'naia_ui_language';
   const DEFAULT_LANGUAGE = 'ja';
   const SUPPORTED_LANGUAGES = new Set(['ja', 'ko']);
-  const TRANSLATABLE_ATTRIBUTES = ['title', 'placeholder', 'aria-label', 'data-naia-guide'];
+  const TRANSLATABLE_ATTRIBUTES = ['title', 'placeholder', 'aria-label', 'data-naia-guide', 'data-naia-title'];
   const HANGUL = /[가-힣]/;
   const messages = window.NAIA_JA_MESSAGES || {};
   const originalText = new WeakMap();
@@ -14,6 +14,7 @@
   function normalize(value) {
     return String(value ?? '')
       .replace(/\r\n/g, '\n')
+      .replace(/\\n/g, '\n')
       .replace(/[ \t\u00a0]+/g, ' ')
       .replace(/ *\n */g, '\n')
       .trim();
@@ -45,7 +46,11 @@
     let pattern = '^';
     for (const match of source.matchAll(/\{(\d+)\}/g)) {
       pattern += literalPattern(source.slice(cursor, match.index));
-      pattern += '([\\s\\S]*?)';
+      // A counter placeholder must not consume Korean prose (e.g. 개 in 소개).
+      const suffix = source.slice(match.index + match[0].length);
+      pattern += /^(?:개|건|명|회|장|초|단계|컷|칸)/.test(suffix)
+        ? '([\\d,.]+)'
+        : (source.includes('\n') ? '([\\s\\S]*?)' : '([^\\n]*?)');
       placeholderGroups.push(Number(match[1]));
       cursor = match.index + match[0].length;
     }
@@ -121,14 +126,15 @@
   function translateTextNode(node) {
     const value = node.nodeValue || '';
     if (shouldSkipTextNode(node)) return;
+    if (originalText.get(node)?.translated === value) return;
 
     const translated = translate(value);
     if (!translated || normalize(translated) === normalize(value)) return;
 
-    originalText.set(node, value);
     const leading = value.match(/^\s*/)?.[0] || '';
     const trailing = value.match(/\s*$/)?.[0] || '';
     node.nodeValue = `${leading}${translated}${trailing}`;
+    originalText.set(node, { source: value, translated: node.nodeValue });
   }
 
   function rememberAttribute(element, name, value) {
@@ -143,13 +149,14 @@
   function translateAttribute(element, name) {
     const value = element.getAttribute(name);
     if (!value) return;
+    if (originalAttributes.get(element)?.get(name)?.translated === value) return;
     const translated = translate(value);
     if (!translated || normalize(translated) === normalize(value)) return;
-    rememberAttribute(element, name, value);
+    rememberAttribute(element, name, { source: value, translated });
     element.setAttribute(name, translated);
   }
 
-  function visit(root, callback) {
+  function visit(root, callback, attributeCallback = translateAttribute) {
     if (!root) return;
     if (root.nodeType === Node.TEXT_NODE) {
       callback(root);
@@ -158,7 +165,7 @@
     if (root.nodeType !== Node.ELEMENT_NODE && root.nodeType !== Node.DOCUMENT_NODE) return;
 
     if (root.nodeType === Node.ELEMENT_NODE) {
-      for (const name of TRANSLATABLE_ATTRIBUTES) translateAttribute(root, name);
+      for (const name of TRANSLATABLE_ATTRIBUTES) attributeCallback(root, name);
     }
 
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
@@ -167,7 +174,7 @@
 
     if (root.querySelectorAll) {
       for (const element of root.querySelectorAll(TRANSLATABLE_ATTRIBUTES.map((name) => `[${name}]`).join(','))) {
-        for (const name of TRANSLATABLE_ATTRIBUTES) translateAttribute(element, name);
+        for (const name of TRANSLATABLE_ATTRIBUTES) attributeCallback(element, name);
       }
     }
   }
@@ -178,16 +185,21 @@
 
   function restoreKorean(root = document) {
     visit(root, (node) => {
-      if (originalText.has(node)) node.nodeValue = originalText.get(node);
-    });
-
-    if (root.querySelectorAll) {
-      for (const element of root.querySelectorAll('*')) {
-        const saved = originalAttributes.get(element);
-        if (!saved) continue;
-        for (const [name, value] of saved) element.setAttribute(name, value);
+      const saved = originalText.get(node);
+      if (saved && node.nodeValue === saved.translated) node.nodeValue = saved.source;
+    }, (element, name) => {
+      const saved = originalAttributes.get(element)?.get(name);
+      // Do not resurrect removed titles or overwrite a newly rendered value.
+      if (saved && element.getAttribute(name) === saved.translated) {
+        element.setAttribute(name, saved.source);
       }
-    }
+    });
+  }
+
+  function sourceAttribute(element, name) {
+    const value = element.getAttribute(name);
+    const saved = originalAttributes.get(element)?.get(name);
+    return saved && value === saved.translated ? saved.source : value;
   }
 
   function preferredLanguage() {
@@ -260,6 +272,7 @@
     apply: applyJapanese,
     getLanguage: () => currentLanguage,
     setLanguage,
+    sourceAttribute,
     t: translate,
   });
 

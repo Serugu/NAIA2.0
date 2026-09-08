@@ -269,7 +269,7 @@ function initNaiaTitleTooltips() {
   const adoptTitle = element => {
     if (!(element instanceof Element) || shouldKeepNativeTitle(element)) return;
     if (!element.hasAttribute('title')) return;
-    const title = element.getAttribute('title');
+    const title = window.naiaI18n?.sourceAttribute(element, 'title') ?? element.getAttribute('title');
     element.removeAttribute('title');
     if (!title) {
       // ⚠️ **빈 `title` 은 "이 툴팁을 지워라" 는 뜻이다.** 예전에는 여기서 그냥
